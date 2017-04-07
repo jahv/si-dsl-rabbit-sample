@@ -16,4 +16,8 @@ public class WorkHandler {
         }
         LOGGER.info("Handling work unit - id: {}, definition: {}", workUnit.getId(), workUnit.getDefinition());
     }
+
+    public void handle(String message) {
+        System.out.println("Received: [" + message + "]");
+    }
 }

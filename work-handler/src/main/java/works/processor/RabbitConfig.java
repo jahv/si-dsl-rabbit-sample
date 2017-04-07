@@ -15,12 +15,15 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 @Configuration
 public class RabbitConfig {
 
+    private static final String EXCHANGE_NAME = "jahv.test.rabbitmq.exchange.rabbitmqspringintegration";
+    private static final String QUEUE_NAME = "jahv.test.rabbitmq.queue.rabbitmqspringintegration";
+
     @Autowired
     private ConnectionFactory rabbitConnectionFactory;
 
     @Bean
     Exchange worksExchange() {
-        return ExchangeBuilder.topicExchange("work.exchange")
+        return ExchangeBuilder.topicExchange(EXCHANGE_NAME)
                 .durable()
                 .build();
     }
@@ -28,8 +31,8 @@ public class RabbitConfig {
 
     @Bean
     public Queue worksQueue() {
-        return QueueBuilder.durable("work.queue")
-                .withArgument("x-dead-letter-exchange", worksDlExchange().getName())
+        return QueueBuilder.durable(QUEUE_NAME)
+                //.withArgument("x-dead-letter-exchange", worksDlExchange().getName())
                 .build();
     }
 
@@ -41,31 +44,31 @@ public class RabbitConfig {
     }
 
     // Dead letter exchange for holding rejected work units..
-    @Bean
-    Exchange worksDlExchange() {
-        return ExchangeBuilder
-                .topicExchange("work.exchange.dl")
-                .durable()
-                .build();
-    }
+//    @Bean
+//    Exchange worksDlExchange() {
+//        return ExchangeBuilder
+//                .topicExchange("work.exchange.dl")
+//                .durable()
+//                .build();
+//    }
 
     //Queue to hold Deadletter messages from worksQueue
-    @Bean
-    public Queue worksDLQueue() {
-        return QueueBuilder
-                .durable("works.queue.dl")
-                .withArgument("x-message-ttl", 20000)
-                .withArgument("x-dead-letter-exchange", worksExchange().getName())
-                .build();
-    }
+//    @Bean
+//    public Queue worksDLQueue() {
+//        return QueueBuilder
+//                .durable("works.queue.dl")
+//                .withArgument("x-message-ttl", 20000)
+//                .withArgument("x-dead-letter-exchange", worksExchange().getName())
+//                .build();
+//    }
 
-    @Bean
-    Binding worksDlBinding() {
-        return BindingBuilder
-                .bind(worksDLQueue())
-                .to(worksDlExchange()).with("#")
-                .noargs();
-    }
+//    @Bean
+//    Binding worksDlBinding() {
+//        return BindingBuilder
+//                .bind(worksDLQueue())
+//                .to(worksDlExchange()).with("#")
+//                .noargs();
+//    }
 
 
 
@@ -75,17 +78,17 @@ public class RabbitConfig {
                 new SimpleMessageListenerContainer(rabbitConnectionFactory);
         container.setQueues(worksQueue());
         container.setConcurrentConsumers(2);
-        container.setDefaultRequeueRejected(false);
+//        container.setDefaultRequeueRejected(false);
 //        container.setAdviceChain(new Advice[]{interceptor()});
         return container;
     }
 
-    @Bean
-    RetryOperationsInterceptor interceptor() {
-        return RetryInterceptorBuilder.stateless()
-                .maxAttempts(5)
-                .backOffOptions(1000, 3, 60000)
-                .recoverer(new RejectAndDontRequeueRecoverer())
-                .build();
-    }
+//    @Bean
+//    RetryOperationsInterceptor interceptor() {
+//        return RetryInterceptorBuilder.stateless()
+//                .maxAttempts(5)
+//                .backOffOptions(1000, 3, 60000)
+//                .recoverer(new RejectAndDontRequeueRecoverer())
+//                .build();
+//    }
 }

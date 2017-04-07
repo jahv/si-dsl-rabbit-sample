@@ -21,10 +21,11 @@ public class WorkInbound {
     public IntegrationFlow inboundFlow() {
         return IntegrationFlows.from(
                 Amqp.inboundAdapter(rabbitConfig.workListenerContainer()))
-                .transform(Transformers.fromJson(WorkUnit.class))
-                .log()
-                .filter("(headers['x-death'] != null) ? headers['x-death'][0].count <= 3: true", f -> f.discardChannel("nullChannel"))
-                .handle("workHandler", "process")
+//                .transform(Transformers.fromJson(WorkUnit.class))
+//                .transform(Transformers.objectToString())
+//                .log()
+//                .filter("(headers['x-death'] != null) ? headers['x-death'][0].count <= 3: true", f -> f.discardChannel("nullChannel"))
+                .handle("workHandler", "handle")
                 .get();
     }
 
